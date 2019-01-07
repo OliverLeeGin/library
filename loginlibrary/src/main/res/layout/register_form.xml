@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scroll_root_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fitsSystemWindows="true"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:id="@+id/ll_container_register_root_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded,UselessLeaf">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="13dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="19dp"
+                android:gravity="center"
+                android:text="@string/register_description_title"
+                android:textColor="@color/title_header_account_color"
+                android:textSize="15dp"
+                tools:ignore="SpUsage" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_general_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="13dp"
+                    android:gravity="center"
+                    android:textColor="@color/title_cancel_account_color"
+                    android:textSize="12dp"
+                    tools:ignore="SpUsage" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/user_name_title"
+                    android:textColor="@color/title_header_account_color"
+                    android:textSize="10dp"
+                    tools:ignore="RtlHardcoded,SpUsage" />
+
+                <EditText
+                    android:id="@+id/edt_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/edt_custom"
+                    android:hint="@string/user_name_title"
+                    android:imeOptions="actionNext"
+                    android:maxLength="20"
+                    android:paddingBottom="18dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="15dp"
+                    android:singleLine="true"
+                    android:textColor="@color/title_header_account_color"
+                    android:textColorHint="@color/stroke_edt_color"
+                    android:textSize="15dp"
+                    tools:ignore="SpUsage" />
+
+                <TextView
+                    android:id="@+id/tv_user_name_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="9dp"
+                    android:textColor="@color/title_cancel_account_color"
+                    android:textSize="8dp"
+                    android:visibility="gone"
+                    tools:ignore="SpUsage"
+                    tools:text="@string/error" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/birth_day_title"
+                    android:textColor="@color/title_header_account_color"
+                    android:textSize="10dp"
+                    tools:ignore="RtlHardcoded,SpUsage" />
+
+                <TextView
+                    android:id="@+id/edt_birth_day"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/edt_custom"
+                    android:hint="@string/hint_birthday"
+                    android:paddingBottom="18dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="15dp"
+                    android:singleLine="true"
+                    android:textColor="@color/title_header_account_color"
+                    android:textColorHint="@color/stroke_edt_color"
+                    android:textSize="15dp"
+                    tools:ignore="SpUsage" />
+
+                <TextView
+                    android:id="@+id/tv_birth_day_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="9dp"
+                    android:textColor="@color/title_cancel_account_color"
+                    android:textSize="8dp"
+                    android:visibility="gone"
+                    tools:ignore="SpUsage"
+                    tools:text="@string/error" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/contact_title"
+                    android:textColor="@color/title_header_account_color"
+                    android:textSize="10dp"
+                    tools:ignore="RtlHardcoded,SpUsage" />
+
+                <EditText
+                    android:id="@+id/edt_contact"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/edt_custom"
+                    android:hint="@string/email"
+                    android:imeOptions="actionNext"
+                    android:paddingBottom="18dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="15dp"
+                    android:singleLine="true"
+                    android:textColor="@color/title_header_account_color"
+                    android:textColorHint="@color/stroke_edt_color"
+                    android:textSize="15dp"
+                    tools:ignore="SpUsage" />
+
+                <TextView
+                    android:id="@+id/tv_email_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:textSize="8dp"
+                    tools:ignore="SpUsage"
+                    tools:text="@string/error" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/password_title"
+                    android:textColor="@color/title_header_account_color"
+                    android:textSize="10dp"
+                    tools:ignore="RtlHardcoded,SpUsage" />
+
+                <EditText
+                    android:id="@+id/edt_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/edt_custom"
+                    android:hint="@string/password_title"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:paddingBottom="18dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="15dp"
+                    android:singleLine="true"
+                    android:textColor="@color/title_header_account_color"
+                    android:textColorHint="@color/stroke_edt_color"
+                    android:textSize="15dp"
+                    tools:ignore="SpUsage,TextFields" />
+
+                <TextView
+                    android:id="@+id/tv_password_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="17dp"
+                    android:text="@{registerViewModel.mTvPassErrorStr}"
+                    android:textSize="8dp"
+                    tools:ignore="SpUsage"
+                    tools:text="@string/error" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="40dp">
+
+                    <TextView
+                        android:id="@+id/btn_register"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/btn_conner"
+                        android:gravity="center"
+                        android:paddingBottom="16dp"
+                        android:paddingTop="18dp"
+                        android:text="@string/btn_register_text"
+                        android:textColor="@color/selector_btn_text_color"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        tools:ignore="SpUsage" />
+
+                    <View
+                        android:id="@+id/view_overlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_mask_btn_login"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

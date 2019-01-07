@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="title_header_account_color">#4A4A4A</color>
+    <color name="title_cancel_account_color">#FB4160</color>
+    <color name="white_color">#ffffff</color>
+    <color name="stroke_edt_color">#AAAAAA</color>
+    <color name="black_30">#4D000000</color>
+    <color name="yellow_color">#FCC800</color>
+    <color name="white_eightty_percent">#ccffffff</color>
+</resources>

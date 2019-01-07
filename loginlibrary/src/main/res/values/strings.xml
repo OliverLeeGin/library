@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">LoginLibrary</string>
+    <string name="register_description_title">Please fill all information below form</string>
+    <string name="user_name_title">UserName</string>
+    <string name="error">Error</string>
+    <string name="birth_day_title">DOB</string>
+    <string name="contact_title">Email</string>
+    <string name="password_title">Password</string>
+    <string name="hint_birthday">Birthday</string>
+    <string name="btn_register_text">Register</string>
+    <string name="email">Email</string>
+    <string name="term_condition">Term Condition</string>
+</resources>
