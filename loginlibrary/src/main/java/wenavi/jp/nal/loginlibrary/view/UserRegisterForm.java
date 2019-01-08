@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -28,6 +29,7 @@ import wenavi.jp.nal.loginlibrary.api.ApiResponse;
 import wenavi.jp.nal.loginlibrary.api.ApiService;
 import wenavi.jp.nal.loginlibrary.config.TimerUtils;
 import wenavi.jp.nal.loginlibrary.model.User;
+import wenavi.jp.nal.loginlibrary.networks.NetworkUtils;
 
 /**
  * Copyright © Nals
@@ -88,6 +90,8 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
         mEdtPassWord.addTextChangedListener(mGeneralTextWatcher);
         mBtnRegister.setOnTouchListener(this);
         mTvBirthday.setOnClickListener(this);
+        mBtnRegister.setEnabled(false);
+        mBtnRegister.setAlpha(mBtnRegister.isEnabled() ? 1f : 0.5f);
         mLlRegisterContaier.setOnClickListener(this);
         mImm = (InputMethodManager) mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
     }
@@ -146,6 +150,10 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
             case MotionEvent.ACTION_UP:
                 if (mRect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
                     mViewOverlay.setVisibility(View.GONE);
+                    if (!NetworkUtils.isNetworkConnected(mContext)) {
+                        Toast.makeText(mContext, "Plz check your network connection", Toast.LENGTH_LONG).show();
+                        return true;
+                    }
                     register();
                 }
                 return true;
