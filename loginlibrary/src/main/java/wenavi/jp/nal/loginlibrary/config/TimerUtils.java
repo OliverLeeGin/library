@@ -1,8 +1,12 @@
 package wenavi.jp.nal.loginlibrary.config;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import static wenavi.jp.nal.loginlibrary.config.TimerUtils.FormatType.TYPE_14;
 
 /**
  * Copyright © Nals
@@ -27,6 +31,20 @@ public final class TimerUtils {
         }
 
         return dateTime;
+    }
+
+    public static Calendar convertStringToCalendarType1(String date) {
+        if (date == null || date.isEmpty())
+            return null;
+
+        Calendar cal = Calendar.getInstance(Locale.JAPANESE);
+        SimpleDateFormat formatDate = new SimpleDateFormat(TYPE_14.getValue(), Locale.JAPANESE);
+        try {
+            cal.setTime(formatDate.parse(date));
+        } catch (ParseException e) {
+            return null;
+        }
+        return cal;
     }
 
     public enum FormatType {

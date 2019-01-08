@@ -3,7 +3,8 @@ package wenavi.jp.nal.loginlibrary.api;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
-import wenavi.jp.nal.loginlibrary.model.User;
+import wenavi.jp.nal.loginlibrary.model.UserRequest;
+import wenavi.jp.nal.loginlibrary.model.UserResponse;
 
 /**
  * Copyright © Nals
@@ -11,7 +12,8 @@ import wenavi.jp.nal.loginlibrary.model.User;
  */
 
 public interface Api {
-    @POST("users")
-    Call<User> registerUser(@Body User user);
+
+    @POST("registration")
+    Call<UserResponse> registerUser(@Body UserRequest userRequest);
 
 }

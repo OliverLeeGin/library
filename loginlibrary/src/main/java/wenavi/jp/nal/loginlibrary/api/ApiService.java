@@ -2,8 +2,6 @@ package wenavi.jp.nal.loginlibrary.api;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +28,7 @@ public final class ApiService {
     private static final int CONNECT_TIMEOUT_MILLS = 1000 * 120;
 
     private ApiService() {
-        mRetrofit = new Retrofit.Builder().baseUrl("http://5c330d61e0948000147a7722.mockapi.io/api/v1/")
+        mRetrofit = new Retrofit.Builder().baseUrl("https://api.toyota-dev.wenavi.net/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getOkHttpClientBuilder().build())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -60,6 +58,21 @@ public final class ApiService {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         okHttpClientBuilder.addInterceptor(interceptor);
+        okHttpClientBuilder.addInterceptor(interceptor);
+
+        okHttpClientBuilder.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                // Customize request header, add access token to request.
+                Request original = chain.request();
+                Request.Builder requestBuilder = original.newBuilder()
+                        .method(original.method(), original.body());
+
+                requestBuilder.addHeader("Secret", "123123");
+                Request request = requestBuilder.build();
+                return chain.proceed(request);
+            }
+        });
         return okHttpClientBuilder;
     }
 
@@ -76,7 +89,7 @@ public final class ApiService {
         return sInstance;
     }
 
-    Retrofit getRetrofit() {
+    public Retrofit getRetrofit() {
         return mRetrofit;
     }
 

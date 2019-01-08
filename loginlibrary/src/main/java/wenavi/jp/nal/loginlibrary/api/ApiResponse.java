@@ -3,7 +3,12 @@ package wenavi.jp.nal.loginlibrary.api;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -31,6 +36,7 @@ public abstract class ApiResponse<T> implements Callback<T> {
     public abstract void onResponse(T t, ApiError y);
 
     public void onFailure(ApiError apiError) {
+        //  Log.d("TAG", "onFailure: " + apiError.getMessage());
         onResponse(null, apiError);
     }
 
@@ -45,45 +51,78 @@ public abstract class ApiResponse<T> implements Callback<T> {
             onResponse(response.body(), new ApiError(response.code(), response.message()));
         } else {
             // Get the error
-            final Converter<ResponseBody, ApiError> converter = ApiService.getInstance().getRetrofit()
-                    .responseBodyConverter(ApiError.class, ApiError.class.getAnnotations());
+            if (response.code() == 422) {
+                try {
+                    if (response != null && response.errorBody() != null) {
+                        JSONObject jsonObject = new JSONObject(response.errorBody().string());
+                        if (jsonObject.has("meta")) {
+                            JSONObject metaObj = jsonObject.getJSONObject("meta");
+                            if (metaObj.has("errors")) {
+                                JSONObject errorObj = metaObj.getJSONObject("errors");
+                                if (errorObj.has("email")) {
+                                    onHandleError422(errorObj.getString("email"));
+                                    return;
+                                } else if (errorObj.has("old_password")) {
+                                    onHandleError422(errorObj.getString("old_password"));
+                                    return;
+                                } else if (errorObj.has("postcode")) {
+                                    onHandleError422(errorObj.getString("postcode"));
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
-            ApiError apiErrorResponse = null;
+            final Converter<ResponseBody, ApiErrorResponse> converter = ApiService.getInstance().getRetrofit()
+                    .responseBodyConverter(ApiErrorResponse.class, ApiErrorResponse.class.getAnnotations());
+
+            ApiErrorResponse apiErrorResponse = null;
             try {
                 apiErrorResponse = converter.convert(response.errorBody());
             } catch (IOException e) {
-                apiErrorResponse = new ApiError(response.code(), response.message());
                 e.printStackTrace();
             }
 
-            final int statusCode = apiErrorResponse.getStatusCode();
+
+            ApiError apiError;
+
+            if (apiErrorResponse == null) {
+                apiError = new ApiError(HttpURLConnection.HTTP_INTERNAL_ERROR, "サーバの内部エラーにより、データが取得できません。");
+            } else {
+                apiError = new ApiError(apiErrorResponse.getMeta() != null ?
+                        apiErrorResponse.getMeta().getStatus() : HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        apiErrorResponse.getMeta() != null ?
+                                apiErrorResponse.getMeta().getMessage() : "サーバの内部エラーにより、データが取得できません。");
+            }
+
+            final int statusCode = apiError.getStatusCode();
             switch (statusCode) {
                 case HttpURLConnection.HTTP_UNAUTHORIZED:
                     String urlRequest = Uri.parse(call.request().url().toString()).getEncodedPath();
-                    onHandleError401(urlRequest, apiErrorResponse);
+                    onHandleError401(urlRequest, apiError);
                     return;
                 case HttpURLConnection.HTTP_GONE:
-                    onHandleError410(apiErrorResponse);
+                    onHandleError410(apiError);
                     return;
                 case 426:
-                    onHandleError426(apiErrorResponse);
+                    onHandleError426(apiError);
                     return;
                 case HttpURLConnection.HTTP_INTERNAL_ERROR:
-                    apiErrorResponse.setMessage("サーバの内部エラーにより、データが取得できません。");
+                    apiError.setMessage("サーバの内部エラーにより、データが取得できません。");
                     break;
                 case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
-                    apiErrorResponse.setMessage("サーバとの接続に失敗しました。");
+                    apiError.setMessage("サーバとの接続に失敗しました。");
                     break;
             }
 
             // Show the dialog error
-            onFailure(apiErrorResponse);
+            onFailure(apiError);
         }
 
-    }
-
-    private void onHandleError401(String urlRequest, ApiError apiError) {
-        onFailure(apiError);
     }
 
     private void onHandleError422(String email) {
@@ -101,6 +140,7 @@ public abstract class ApiResponse<T> implements Callback<T> {
                 .message(t.getLocalizedMessage())
                 .build();
         onFailure(apiError);
+        //  Crashlytics.logException(t);
     }
 
     boolean isActivityDestroyed() {
@@ -110,6 +150,12 @@ public abstract class ApiResponse<T> implements Callback<T> {
         } catch (ClassCastException e) {
             return false;
         }
+    }
+
+    @CallSuper
+    void onHandleError401(@NonNull String urlRequest, @NonNull ApiError apiError) {
+        // Reset access token
+        onFailure(apiError);
     }
 
     void onHandleError410(@NonNull ApiError apiError) {

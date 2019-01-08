@@ -28,4 +28,5 @@ public class RegisterActivity extends AppCompatActivity implements UserRegisterF
         setResult(RESULT_OK, intent);
         finish();
     }
+
 }

@@ -6,10 +6,10 @@ import lombok.Data;
 
 /**
  * Copyright © Nals
- * Created by TrangLT on 1/7/19.
+ * Created by TrangLT on 10/2/18.
  */
 @Data
-public class Food {
-    @SerializedName("name")
-    private String nameFood;
+public class UserResponse {
+    @SerializedName("data")
+    private User user;
 }

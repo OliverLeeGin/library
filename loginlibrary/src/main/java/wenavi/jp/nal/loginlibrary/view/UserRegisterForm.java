@@ -29,6 +29,8 @@ import wenavi.jp.nal.loginlibrary.api.ApiResponse;
 import wenavi.jp.nal.loginlibrary.api.ApiService;
 import wenavi.jp.nal.loginlibrary.config.TimerUtils;
 import wenavi.jp.nal.loginlibrary.model.User;
+import wenavi.jp.nal.loginlibrary.model.UserRequest;
+import wenavi.jp.nal.loginlibrary.model.UserResponse;
 import wenavi.jp.nal.loginlibrary.networks.NetworkUtils;
 
 /**
@@ -169,17 +171,13 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
     }
 
     private void register() {
-        User user = new User(
-                mEdtUserName.getText().toString(),
-                mTvBirthday.getText().toString(),
-                mEdtEmail.getText().toString(),
-                mEdtPassWord.getText().toString());
-        ApiService.getInstance(mContext).getApi().registerUser(user).enqueue(new ApiResponse<User>(mContext) {
+        final UserRequest userRequest = createUserResuest();
+        ApiService.getInstance(mContext).getApi().registerUser(userRequest).enqueue(new ApiResponse<UserResponse>(mContext) {
             @Override
-            public void onResponse(User user, ApiError y) {
-                if (user != null) {
+            public void onResponse(UserResponse userResponse, ApiError y) {
+                if (userResponse != null && userResponse.getUser() != null) {
                     if (mIOnResultListener != null) {
-                        mIOnResultListener.success(user);
+                        mIOnResultListener.success(userResponse.getUser());
                     }
                 }
             }
@@ -187,9 +185,24 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
             @Override
             public void onFailure(ApiError apiError) {
                 super.onFailure(apiError);
-                mTvGeneralError.setText(apiError != null ? apiError.getMessage() : "500 Internal Sever !");
+                if (mIOnResultListener != null) {
+                    mIOnResultListener.onFailed(apiError != null ? apiError.getMessage() : "bad request!!!");
+                }
             }
         });
+    }
+
+    private UserRequest createUserResuest() {
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername(mEdtUserName.getText().toString());
+        userRequest.setBirthday(TimerUtils.getDatetime(TimerUtils
+                        .convertStringToCalendarType1(mTvBirthday.getText().toString()).getTimeInMillis(),
+                TimerUtils.FormatType.TYPE_1));
+        userRequest.setEmail(mEdtEmail.getText().toString());
+        userRequest.setPassword(mEdtPassWord.getText().toString());
+        userRequest.setDeviceType(1);
+        userRequest.setDeviceToken("AbcYhDDzzzzgggggKKKK");
+        return userRequest;
     }
 
     @Override
@@ -223,5 +236,7 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
 
     public interface IOnResultListener {
         void success(User user);
+
+        void onFailed(String message);
     }
 }
