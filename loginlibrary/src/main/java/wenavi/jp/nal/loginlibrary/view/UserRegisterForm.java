@@ -254,6 +254,7 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
                 e.printStackTrace();
             }
             try {
+                assert conn != null;
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
                     BufferedReader in = new BufferedReader(new
                             InputStreamReader(conn.getInputStream()));

@@ -19,7 +19,6 @@ public class RegisterActivity extends AppCompatActivity implements UserRegisterF
         setContentView(R.layout.register_activity);
         UserRegisterForm userRegisterForm = findViewById(R.id.tv_test);
         userRegisterForm.setRegisterResponseListener(this);
-        UserManger user = new UserManger();
     }
 
     @Override
