@@ -2,50 +2,58 @@ package wenavi.jp.nal.loginlibrary.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
-
-import com.google.gson.annotations.SerializedName;
-
-import lombok.Data;
 
 /**
  * Copyright © Nals
  * Created by TrangLT on 9/13/18.
  */
-@Data
 public class User implements Parcelable {
     private String email;
     private String birthday;
     private String username;
-    @SerializedName("role_id")
-    private int roleId;
-    @SerializedName("updated_at")
-    private String updatedAt;
-    @SerializedName("created_at")
-    private String createdAt;
-    @SerializedName("id")
-    private int id;
-    private String address1;
-    private String address2;
-    @SerializedName("postcode")
-    private String postCode;
-    @SerializedName("is_receive_notification_emergency")
-    private int turnOnEmergence;
 
     public User() {
-        //no-op
+
+    }
+
+    public User(String email, String birthday, String username) {
+        this.email = email;
+        this.birthday = birthday;
+        this.username = username;
     }
 
     protected User(Parcel in) {
         email = in.readString();
         birthday = in.readString();
         username = in.readString();
-        roleId = in.readInt();
-        updatedAt = in.readString();
-        createdAt = in.readString();
-        id = in.readInt();
-        turnOnEmergence = in.readInt();
-        postCode = in.readString();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public static Creator<User> getCREATOR() {
+        return CREATOR;
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -70,23 +78,5 @@ public class User implements Parcelable {
         dest.writeString(email);
         dest.writeString(birthday);
         dest.writeString(username);
-        dest.writeInt(roleId);
-        dest.writeString(updatedAt);
-        dest.writeString(createdAt);
-        dest.writeInt(id);
-        dest.writeString(postCode);
-        dest.writeInt(turnOnEmergence);
-    }
-
-    public String getAddress() {
-        return getAddress1() + " " + getAddress2();
-    }
-
-    public String getAddress1() {
-        return !TextUtils.isEmpty(address1) ? address1 : "";
-    }
-
-    public String getAddress2() {
-        return !TextUtils.isEmpty(address2) ? address2 : "";
     }
 }
