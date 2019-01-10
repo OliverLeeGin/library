@@ -9,7 +9,7 @@ import wenavi.jp.nal.loginlibrary.view.UserRegisterForm;
 
 /**
  * Copyright © Nals
- * Created by TrangLT on 1/7/19.
+ * Created by macintosh on 1/8/19.
  */
 
 public class RegisterActivity extends AppCompatActivity implements UserRegisterForm.IOnResultListener {
@@ -23,8 +23,17 @@ public class RegisterActivity extends AppCompatActivity implements UserRegisterF
 
     @Override
     public void success(User user) {
+        setValues(user.getEmail());
+    }
+
+    @Override
+    public void onFailed(String errorStr) {
+        setValues(errorStr);
+    }
+
+    private void setValues(String value) {
         Intent intent = new Intent();
-        intent.putExtra("user", user.getUserName());
+        intent.putExtra("value", value);
         setResult(RESULT_OK, intent);
         finish();
     }
