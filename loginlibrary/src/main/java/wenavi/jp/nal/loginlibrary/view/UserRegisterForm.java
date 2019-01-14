@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -22,24 +21,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
 import wenavi.jp.nal.loginlibrary.R;
+import wenavi.jp.nal.loginlibrary.api.PostingApiService;
 import wenavi.jp.nal.loginlibrary.config.TimerUtils;
 import wenavi.jp.nal.loginlibrary.model.User;
 import wenavi.jp.nal.loginlibrary.networks.NetworkUtils;
+
+import static wenavi.jp.nal.loginlibrary.api.ApiService.URL_REGISTER_ENDPOINT;
 
 /**
  * Copyright © Nals
@@ -47,17 +43,14 @@ import wenavi.jp.nal.loginlibrary.networks.NetworkUtils;
  */
 
 public class UserRegisterForm extends RelativeLayout implements DatePickerDialog.OnDateSetListener,
-        View.OnTouchListener, View.OnClickListener {
+        View.OnTouchListener, View.OnClickListener, PostingApiService.IOnResponseResult {
     private final float ALPHA_ENABLE = 1f;
     private final float ALPHA_DISABLE = 0.5f;
-    private final String URL_DOMAIN = "https://api.toyota-dev.wenavi.net/api/";
-    private final String URL_REGISTER_ENDPOINT = "registration";
-    private final int MAX_TIME_REQUEST = 15000;
 
     private LinearLayout mLlRegisterContaier;
     private EditText mEdtUserName;
     private TextView mTvBirthday;
-    private EditText mEdtEmail;
+    public EditText mEdtEmail;
     private EditText mEdtPassWord;
     private Context mContext;
     private TextView mBtnRegister;
@@ -122,7 +115,7 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
         }
     };
 
-    private void checkEnableRegister() {
+    public void checkEnableRegister() {
         mBtnRegister.setEnabled(!TextUtils.isEmpty(mEdtUserName.getText()) &&
                 !TextUtils.isEmpty(mTvBirthday.getText()) &&
                 !TextUtils.isEmpty(mEdtEmail.getText()) &&
@@ -162,7 +155,11 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
                         Toast.makeText(mContext, "Plz check your network connection", Toast.LENGTH_LONG).show();
                         return true;
                     }
-                    register();
+                    try {
+                        register();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return true;
             case MotionEvent.ACTION_CANCEL:
@@ -206,120 +203,53 @@ public class UserRegisterForm extends RelativeLayout implements DatePickerDialog
     }
 
 
-    private void register() {
-        new RegisterUser().execute();
+    private void register() throws JSONException {
+        JSONObject jsonObject = createUserResuest();
+        new PostingApiService(URL_REGISTER_ENDPOINT, jsonObject, this).execute();
+    }
+
+    @Override
+    public void onResponse(String result) {
+        if (!TextUtils.isEmpty(result)) {
+            Gson gson = new Gson();
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(result);
+                if (jsonObject.has("meta")) {
+                    if (jsonObject.has("meta")) {
+                        JSONObject metaObj = jsonObject.getJSONObject("meta");
+                        if (metaObj.has("errors")) {
+                            JSONObject errorObj = metaObj.getJSONObject("errors");
+                            if (errorObj.has("email")) {
+                                if (mIOnResultListener != null) {
+                                    mIOnResultListener.onFailed(errorObj.getString("email"));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (jsonObject.has("data")) {
+                    JSONObject userObj = jsonObject.getJSONObject("data");
+                    Log.d("llt", "onPostExecute: " + userObj);
+                    User user = new User();
+                    if (userObj.has("email")) {
+                        user.setEmail(userObj.getString("email"));
+                    }
+                    if (mIOnResultListener != null) {
+                        mIOnResultListener.success(user);
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public interface IOnResultListener {
         void success(User user);
 
         void onFailed(String message);
-    }
-
-    private final class RegisterUser extends AsyncTask<String, Void, String> {
-
-        protected void onPreExecute() {
-
-        }
-
-        protected String doInBackground(String... arg0) {
-
-            URL url = null;
-            HttpURLConnection
-                    conn = null;
-            try {
-                url = new URL(URL_DOMAIN + URL_REGISTER_ENDPOINT);
-                JSONObject postDataParams = createUserResuest();
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(MAX_TIME_REQUEST);
-                conn.setConnectTimeout(MAX_TIME_REQUEST);
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Secret", "123123");
-                conn.setRequestProperty("content-type", "application/json");
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
-
-                OutputStream os = null;
-
-                os = conn.getOutputStream();
-                BufferedWriter writer = null;
-                writer = new BufferedWriter(
-                        new OutputStreamWriter(os, "UTF-8"));
-                writer.write(postDataParams.toString());
-                writer.flush();
-                writer.close();
-                os.close();
-            } catch (Exception e) {
-                Log.d("llt", "errorSendRequest: " + e.getMessage());
-                e.printStackTrace();
-            }
-            try {
-                assert conn != null;
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
-                    BufferedReader in = new BufferedReader(new
-                            InputStreamReader(conn.getInputStream()));
-                    StringBuilder sb = new StringBuilder("");
-                    String line = "";
-                    while ((line = in.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    in.close();
-                    return sb.toString();
-                } else {
-                    BufferedReader inError = new BufferedReader(new
-                            InputStreamReader(
-                            conn.getErrorStream()));
-
-                    StringBuilder sbError = new StringBuilder("");
-                    String lineError = "";
-                    while ((lineError = inError.readLine()) != null) {
-                        sbError.append(lineError);
-                    }
-                    inError.close();
-                    return sbError.toString();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (!TextUtils.isEmpty(result)) {
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(result);
-                    if (jsonObject.has("meta")) {
-                        if (jsonObject.has("meta")) {
-                            JSONObject metaObj = jsonObject.getJSONObject("meta");
-                            if (metaObj.has("errors")) {
-                                JSONObject errorObj = metaObj.getJSONObject("errors");
-                                if (errorObj.has("email")) {
-                                    if (mIOnResultListener != null) {
-                                        mIOnResultListener.onFailed(errorObj.getString("email"));
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (jsonObject.has("data")) {
-                        JSONObject userObj = jsonObject.getJSONObject("data");
-                        Log.d("llt", "onPostExecute: " + userObj);
-                        User user = new User();
-                        if (userObj.has("email")) {
-                            user.setEmail(userObj.getString("email"));
-                        }
-                        if (mIOnResultListener != null) {
-                            mIOnResultListener.success(user);
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     private JSONObject createUserResuest() throws JSONException {
